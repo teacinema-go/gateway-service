@@ -1,0 +1,3 @@
+module github.com/teacinema-go/gateway-service
+
+go 1.25.2
