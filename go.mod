@@ -6,7 +6,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/spf13/viper v1.21.0
-	github.com/teacinema-go/core v0.3.0
+	github.com/teacinema-go/core v0.4.0
 )
 
 require (

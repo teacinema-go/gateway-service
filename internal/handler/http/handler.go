@@ -8,16 +8,20 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-playground/validator/v10"
 	mw "github.com/teacinema-go/gateway-service/internal/middleware"
 )
 
 type Handler struct {
 	l *slog.Logger
+	v *validator.Validate
 }
 
 func NewHandler(l *slog.Logger) *Handler {
+	v := validator.New()
 	return &Handler{
 		l: l,
+		v: v,
 	}
 }
 
@@ -44,7 +48,9 @@ func (h *Handler) Routes() http.Handler {
 
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
-
+			r.Route("/auth", func(r chi.Router) {
+				r.Post("/send-otp", h.SendOtp)
+			})
 		})
 	})
 
