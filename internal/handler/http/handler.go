@@ -2,12 +2,12 @@ package http
 
 import (
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/teacinema-go/core/http/response"
 	mw "github.com/teacinema-go/gateway-service/internal/middleware"
 )
 
@@ -21,7 +21,7 @@ func NewHandler(l *slog.Logger) *Handler {
 	}
 }
 
-func (h *Handler) SendResponse(statusCode int, w http.ResponseWriter, resp *response.Response) {
+func (h *Handler) SendResponse(statusCode int, w http.ResponseWriter, resp any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 
@@ -46,6 +46,11 @@ func (h *Handler) Routes() http.Handler {
 		r.Route("/v1", func(r chi.Router) {
 
 		})
+	})
+
+	_ = chi.Walk(r, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+		h.l.Debug(fmt.Sprintf("[%s]: %s", method, route))
+		return nil
 	})
 
 	return r

@@ -7,16 +7,16 @@ import (
 	"github.com/teacinema-go/core/http/response"
 )
 
-func (h *Handler) Health(w http.ResponseWriter, r *http.Request) {
-	resp := response.NewSuccessResponse("ok", response.Data{
-		"timestamp": time.Now().Format("2006-01-02 15:04:05"),
-	})
+type HealthData struct {
+	Timestamp string `json:"timestamp"`
+}
 
+func (h *Handler) Health(w http.ResponseWriter, r *http.Request) {
 	h.l.Debug("health check requested",
 		"method", r.Method,
 		"path", r.URL.Path,
 		"remote_addr", r.RemoteAddr,
 	)
 
-	h.SendResponse(http.StatusOK, w, resp)
+	h.SendResponse(http.StatusOK, w, response.Success("ok", HealthData{time.Now().Format(time.DateTime)}))
 }
