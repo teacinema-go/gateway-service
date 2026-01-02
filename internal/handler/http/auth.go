@@ -6,6 +6,7 @@ import (
 
 	"github.com/teacinema-go/core/http/response"
 	"github.com/teacinema-go/gateway-service/internal/dto"
+	"github.com/teacinema-go/gateway-service/internal/validator"
 )
 
 func (h *Handler) SendOtp(w http.ResponseWriter, r *http.Request) {
@@ -18,6 +19,13 @@ func (h *Handler) SendOtp(w http.ResponseWriter, r *http.Request) {
 
 	if err := h.v.Struct(req); err != nil {
 		// TODO format validation messages
+		h.SendResponse(http.StatusUnprocessableEntity, w, response.Error("validation failed", map[string]any{
+			"error": err.Error(),
+		}))
+		return
+	}
+
+	if err := validator.ValidateIdentifierFormat(req); err != nil {
 		h.SendResponse(http.StatusUnprocessableEntity, w, response.Error("validation failed", map[string]any{
 			"error": err.Error(),
 		}))

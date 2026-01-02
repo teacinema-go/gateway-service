@@ -49,7 +49,7 @@ func (h *Handler) Routes() http.Handler {
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
 			r.Route("/auth", func(r chi.Router) {
-				r.Post("/send-otp", h.SendOtp)
+				r.Post("/otp/send", h.SendOtp)
 			})
 		})
 	})
