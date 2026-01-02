@@ -13,14 +13,14 @@ func ValidateIdentifierFormat(req dto.SendOtpRequest) error {
 	switch req.Type {
 	case dto.IdentifierEmail:
 		if !isValidEmail(req.Identifier) {
-			return appErrors.ErrInvalidEmail
+			return appErrors.InvalidEmailError("identifier")
 		}
 	case dto.IdentifierPhone:
 		if !isValidE164Phone(req.Identifier) {
-			return appErrors.ErrInvalidPhone
+			return appErrors.InvalidE164PhoneError("identifier")
 		}
 	default:
-		return appErrors.ErrInvalidIdentifierType
+		return appErrors.InvalidFieldError("identifier type")
 	}
 
 	return nil
