@@ -9,22 +9,22 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-playground/validator/v10"
-	"github.com/teacinema-go/gateway-service/internal/client/grpc"
 	mw "github.com/teacinema-go/gateway-service/internal/middleware"
+	"github.com/teacinema-go/gateway-service/internal/service"
 )
 
 type Handler struct {
-	l          *slog.Logger
-	v          *validator.Validate
-	authClient *grpc.AuthClient
+	l        *slog.Logger
+	v        *validator.Validate
+	services *service.Manager
 }
 
-func NewHandler(l *slog.Logger, authClient *grpc.AuthClient) *Handler {
+func NewHandler(l *slog.Logger, services *service.Manager) *Handler {
 	v := validator.New()
 	return &Handler{
-		l:          l,
-		v:          v,
-		authClient: authClient,
+		l:        l,
+		v:        v,
+		services: services,
 	}
 }
 
