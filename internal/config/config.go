@@ -10,7 +10,8 @@ import (
 )
 
 type Config struct {
-	App AppConfig `mapstructure:",squash"`
+	App     AppConfig     `mapstructure:",squash"`
+	Service ServiceConfig `mapstructure:",squash"`
 }
 
 type AppConfig struct {
@@ -19,10 +20,15 @@ type AppConfig struct {
 	Host string        `mapstructure:"APP_HOST" validate:"required,url"`
 }
 
+type ServiceConfig struct {
+	AuthServiceURL string `mapstructure:"SERVICE_AUTH_URL" validate:"required,url"`
+}
+
 func Load() (*Config, error) {
 	viper.SetDefault("APP_ENV", constants.Development)
 	viper.SetDefault("APP_PORT", 8000)
 	viper.SetDefault("APP_HOST", "http://localhost:8000")
+	viper.SetDefault("SERVICE_AUTH_URL", "http://localhost:50051")
 
 	viper.SetConfigFile(".env")
 	viper.AutomaticEnv()

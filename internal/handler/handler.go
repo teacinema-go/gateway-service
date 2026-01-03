@@ -1,4 +1,4 @@
-package http
+package handler
 
 import (
 	"encoding/json"
@@ -9,19 +9,22 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-playground/validator/v10"
+	"github.com/teacinema-go/gateway-service/internal/client/grpc"
 	mw "github.com/teacinema-go/gateway-service/internal/middleware"
 )
 
 type Handler struct {
-	l *slog.Logger
-	v *validator.Validate
+	l          *slog.Logger
+	v          *validator.Validate
+	authClient *grpc.AuthClient
 }
 
-func NewHandler(l *slog.Logger) *Handler {
+func NewHandler(l *slog.Logger, authClient *grpc.AuthClient) *Handler {
 	v := validator.New()
 	return &Handler{
-		l: l,
-		v: v,
+		l:          l,
+		v:          v,
+		authClient: authClient,
 	}
 }
 

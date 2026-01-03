@@ -11,8 +11,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/teacinema-go/gateway-service/internal/client/grpc"
 	"github.com/teacinema-go/gateway-service/internal/config"
-	httpHandler "github.com/teacinema-go/gateway-service/internal/handler/http"
+	"github.com/teacinema-go/gateway-service/internal/handler"
 )
 
 type App struct {
@@ -29,11 +30,22 @@ func New(cfg *config.Config, logger *slog.Logger) *App {
 }
 
 func (a *App) Run() error {
-	handler := httpHandler.NewHandler(a.logger)
+	authClient, err := grpc.NewAuthClient(a.cfg.Service.AuthServiceURL, a.logger)
+	if err != nil {
+		a.logger.Error("could not create auth client", "error", err)
+	}
+	defer func(authClient *grpc.AuthClient) {
+		err = authClient.Close()
+		if err != nil {
+			a.logger.Warn("Failed to close Auth Client")
+		}
+	}(authClient)
+
+	h := handler.NewHandler(a.logger, authClient)
 
 	a.httpServer = &http.Server{
 		Addr:         fmt.Sprintf(":%d", a.cfg.App.Port),
-		Handler:      handler.Routes(),
+		Handler:      h.Routes(),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  60 * time.Second,
