@@ -3,7 +3,6 @@ package service
 import (
 	"fmt"
 	"io"
-	"log/slog"
 
 	"github.com/teacinema-go/gateway-service/internal/config"
 	"google.golang.org/grpc"
@@ -15,8 +14,8 @@ type Manager struct {
 	services []io.Closer
 }
 
-func NewServiceManager(serviceConfig config.ServiceConfig, logger *slog.Logger) (*Manager, error) {
-	authService, err := NewAuthService(serviceConfig.AuthServiceURL, logger)
+func NewServiceManager(serviceConfig config.ServiceConfig) (*Manager, error) {
+	authService, err := NewAuthService(serviceConfig.AuthServiceURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create auth service: %w", err)
 	}
