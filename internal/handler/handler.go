@@ -14,27 +14,27 @@ import (
 )
 
 type Handler struct {
-	l        *slog.Logger
-	v        *validator.Validate
-	services *service.Manager
+	logger    *slog.Logger
+	validator *validator.Validate
+	services  *service.Manager
 }
 
-func NewHandler(l *slog.Logger, services *service.Manager) *Handler {
+func NewHandler(logger *slog.Logger, services *service.Manager) *Handler {
 	v := validator.New()
 	return &Handler{
-		l:        l,
-		v:        v,
-		services: services,
+		logger:    logger,
+		validator: v,
+		services:  services,
 	}
 }
 
-func (h *Handler) SendResponse(statusCode int, w http.ResponseWriter, resp any) {
+func (h *Handler) SendResponse(w http.ResponseWriter, statusCode int, resp any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 
 	err := json.NewEncoder(w).Encode(resp)
 	if err != nil {
-		h.l.Error("error encoding response", "error", err)
+		h.logger.Error("error encoding response", "error", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }
@@ -44,7 +44,7 @@ func (h *Handler) Routes() http.Handler {
 
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
-	r.Use(mw.Logger(h.l))
+	r.Use(mw.Logger(h.logger))
 	r.Use(middleware.Recoverer)
 
 	r.Get("/health", h.Health)
@@ -58,7 +58,7 @@ func (h *Handler) Routes() http.Handler {
 	})
 
 	_ = chi.Walk(r, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
-		h.l.Debug(fmt.Sprintf("[%s]: %s", method, route))
+		h.logger.Debug(fmt.Sprintf("[%s]: %s", method, route))
 		return nil
 	})
 

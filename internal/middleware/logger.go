@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func Logger(l *slog.Logger) func(next http.Handler) http.Handler {
+func Logger(logger *slog.Logger) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
@@ -16,7 +16,7 @@ func Logger(l *slog.Logger) func(next http.Handler) http.Handler {
 			ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 
 			defer func() {
-				l.Info("http request",
+				logger.Info("http request",
 					slog.String("method", r.Method),
 					slog.String("path", r.URL.Path),
 					slog.String("remote_addr", r.RemoteAddr),
