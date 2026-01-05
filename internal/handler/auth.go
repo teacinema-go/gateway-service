@@ -36,7 +36,7 @@ func (h *Handler) SendOtp(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
-	res, err := h.services.Auth.SendOtp(ctx, req)
+	res, err := h.clients.Auth.SendOtp(ctx, req)
 	if err != nil || !res.GetOk() {
 		h.logger.Error("sendOtp request failed", "error", err)
 		h.SendResponse(w, http.StatusInternalServerError, response.ErrorNoData("internal server error"))

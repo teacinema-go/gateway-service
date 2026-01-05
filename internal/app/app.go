@@ -11,9 +11,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/teacinema-go/gateway-service/internal/clients"
 	"github.com/teacinema-go/gateway-service/internal/config"
 	"github.com/teacinema-go/gateway-service/internal/handler"
-	"github.com/teacinema-go/gateway-service/internal/service"
 )
 
 type App struct {
@@ -30,17 +30,17 @@ func New(cfg *config.Config, logger *slog.Logger) *App {
 }
 
 func (a *App) Run() error {
-	serviceManager, err := service.NewServiceManager(a.cfg.Service)
+	clientManager, err := clients.NewClientManager(a.cfg.Service)
 	if err != nil {
-		return fmt.Errorf("failed to create service manager: %w", err)
+		return fmt.Errorf("failed to create client manager: %w", err)
 	}
 	defer func() {
-		if err := serviceManager.Close(); err != nil {
-			a.logger.Error("failed to close service manager", "error", err)
+		if err := clientManager.Close(); err != nil {
+			a.logger.Error("failed to close client manager", "error", err)
 		}
 	}()
 
-	h := handler.NewHandler(a.logger, serviceManager)
+	h := handler.NewHandler(a.logger, clientManager)
 
 	a.httpServer = &http.Server{
 		Addr:         fmt.Sprintf(":%d", a.cfg.App.Port),

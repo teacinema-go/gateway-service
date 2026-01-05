@@ -1,8 +1,7 @@
-package service
+package clients
 
 import (
 	"fmt"
-	"io"
 
 	"github.com/teacinema-go/gateway-service/internal/config"
 	"google.golang.org/grpc"
@@ -10,26 +9,30 @@ import (
 )
 
 type Manager struct {
-	Auth     AuthService
-	services []io.Closer
+	Auth    AuthServiceClient
+	clients []Closer
 }
 
-func NewServiceManager(serviceConfig config.ServiceConfig) (*Manager, error) {
-	authService, err := NewAuthService(serviceConfig.AuthServiceURL)
+type Closer interface {
+	Close() error
+}
+
+func NewClientManager(serviceConfig config.ServiceConfig) (*Manager, error) {
+	authService, err := NewAuthServiceClient(serviceConfig.AuthServiceURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create auth service: %w", err)
 	}
 
 	return &Manager{
-		Auth:     authService,
-		services: []io.Closer{authService},
+		Auth:    authService,
+		clients: []Closer{authService},
 	}, nil
 }
 
 func (m *Manager) Close() error {
 	var firstErr error
-	for _, service := range m.services {
-		if err := service.Close(); err != nil && firstErr == nil {
+	for _, client := range m.clients {
+		if err := client.Close(); err != nil && firstErr == nil {
 			firstErr = err
 		}
 	}

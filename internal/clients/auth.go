@@ -1,4 +1,4 @@
-package service
+package clients
 
 import (
 	"context"
@@ -8,25 +8,30 @@ import (
 	"google.golang.org/grpc"
 )
 
-type authService struct {
+type authServiceClient struct {
 	client authv1.AuthServiceClient
 	conn   *grpc.ClientConn
 }
 
-func NewAuthService(authServiceUrl string) (AuthService, error) {
+type AuthServiceClient interface {
+	SendOtp(ctx context.Context, req dto.SendOtpRequest) (*authv1.SendOtpResponse, error)
+	Close() error
+}
+
+func NewAuthServiceClient(authServiceUrl string) (AuthServiceClient, error) {
 	conn, err := newGRPCConnection(authServiceUrl)
 	if err != nil {
 		return nil, err
 	}
 
 	client := authv1.NewAuthServiceClient(conn)
-	return &authService{
+	return &authServiceClient{
 		client: client,
 		conn:   conn,
 	}, nil
 }
 
-func (s *authService) Close() error {
+func (s *authServiceClient) Close() error {
 	err := s.conn.Close()
 	if err != nil {
 		return err
@@ -34,7 +39,7 @@ func (s *authService) Close() error {
 	return nil
 }
 
-func (s *authService) SendOtp(ctx context.Context, r dto.SendOtpRequest) (*authv1.SendOtpResponse, error) {
+func (s *authServiceClient) SendOtp(ctx context.Context, r dto.SendOtpRequest) (*authv1.SendOtpResponse, error) {
 	req := &authv1.SendOtpRequest{
 		Identifier: r.Identifier,
 		Type:       string(r.Type),
