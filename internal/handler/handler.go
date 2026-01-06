@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -25,17 +24,6 @@ func NewHandler(logger *slog.Logger, clients *clients.Manager) *Handler {
 		logger:    logger,
 		validator: v,
 		clients:   clients,
-	}
-}
-
-func (h *Handler) SendResponse(w http.ResponseWriter, statusCode int, resp any) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-
-	err := json.NewEncoder(w).Encode(resp)
-	if err != nil {
-		h.logger.Error("error encoding response", "error", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }
 
