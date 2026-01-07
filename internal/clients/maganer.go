@@ -40,7 +40,7 @@ func (m *Manager) Close() error {
 }
 
 func newGRPCConnection(serviceURL string) (*grpc.ClientConn, error) {
-	// TODO: use TLS in production
+	// TODO: use TLS in production, use circuit breaker or other pattern in production
 	conn, err := grpc.NewClient(
 		serviceURL,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),

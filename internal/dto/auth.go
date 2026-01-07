@@ -3,19 +3,13 @@ package dto
 import (
 	"github.com/go-playground/validator/v10"
 	appErrors "github.com/teacinema-go/gateway-service/internal/errors"
+	"github.com/teacinema-go/gateway-service/pkg/enum"
 	appValidator "github.com/teacinema-go/gateway-service/pkg/validator"
 )
 
-type IdentifierType string
-
-const (
-	IdentifierPhone IdentifierType = "phone"
-	IdentifierEmail IdentifierType = "email"
-)
-
 type SendOtpRequest struct {
-	Identifier string         `json:"identifier" validate:"required"`
-	Type       IdentifierType `json:"type" validate:"required,oneof=phone email"`
+	Identifier string              `json:"identifier" validate:"required"`
+	Type       enum.IdentifierType `json:"type" validate:"required,oneof=phone email"`
 }
 
 func (r *SendOtpRequest) Validate(v *validator.Validate) error {
@@ -25,11 +19,11 @@ func (r *SendOtpRequest) Validate(v *validator.Validate) error {
 	}
 
 	switch r.Type {
-	case IdentifierEmail:
+	case enum.IdentifierEmail:
 		if !appValidator.IsValidEmail(r.Identifier) {
 			return appErrors.InvalidEmailError("identifier")
 		}
-	case IdentifierPhone:
+	case enum.IdentifierPhone:
 		if !appValidator.IsValidE164Phone(r.Identifier) {
 			return appErrors.InvalidE164PhoneError("identifier")
 		}
