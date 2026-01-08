@@ -41,6 +41,7 @@ func (h *Handler) Routes() http.Handler {
 		r.Route("/v1", func(r chi.Router) {
 			r.Route("/auth", func(r chi.Router) {
 				r.Post("/otp/send", h.SendOtp)
+				r.Post("/otp/verify", h.VerifyOtp)
 			})
 		})
 	})

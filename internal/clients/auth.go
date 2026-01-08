@@ -4,7 +4,7 @@ import (
 	"context"
 
 	authv1 "github.com/teacinema-go/contracts/gen/go/auth/v1"
-	"github.com/teacinema-go/gateway-service/internal/dto"
+	"github.com/teacinema-go/gateway-service/internal/dto/request"
 	"google.golang.org/grpc"
 )
 
@@ -14,7 +14,8 @@ type authServiceClient struct {
 }
 
 type AuthServiceClient interface {
-	SendOtp(ctx context.Context, req dto.SendOtpRequest) (*authv1.SendOtpResponse, error)
+	SendOtp(ctx context.Context, req request.SendOtpRequest) (*authv1.SendOtpResponse, error)
+	VerifyOtp(ctx context.Context, req request.VerifyOtpRequest) (*authv1.VerifyOtpResponse, error)
 	Close() error
 }
 
@@ -39,13 +40,27 @@ func (s *authServiceClient) Close() error {
 	return nil
 }
 
-func (s *authServiceClient) SendOtp(ctx context.Context, r dto.SendOtpRequest) (*authv1.SendOtpResponse, error) {
+func (s *authServiceClient) SendOtp(ctx context.Context, r request.SendOtpRequest) (*authv1.SendOtpResponse, error) {
 	req := &authv1.SendOtpRequest{
-		Identifier: r.Identifier,
-		Type:       string(r.Type),
+		Identifier:     r.Identifier,
+		IdentifierType: r.IdentifierType.ToProto(),
 	}
 
 	res, err := s.client.SendOtp(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (s *authServiceClient) VerifyOtp(ctx context.Context, r request.VerifyOtpRequest) (*authv1.VerifyOtpResponse, error) {
+	req := &authv1.VerifyOtpRequest{
+		Identifier:     r.Identifier,
+		IdentifierType: r.IdentifierType.ToProto(),
+		Otp:            r.Otp,
+	}
+
+	res, err := s.client.VerifyOtp(ctx, req)
 	if err != nil {
 		return nil, err
 	}

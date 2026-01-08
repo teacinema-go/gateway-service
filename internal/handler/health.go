@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log/slog"
 	"net/http"
 	"time"
 
@@ -10,9 +9,7 @@ import (
 )
 
 func (h *Handler) Health(w http.ResponseWriter, _ *http.Request) {
-	log := h.logger.With(slog.String("method", "Health"))
-
-	pkgHTTP.SendResponse(w, log, http.StatusOK, response.Success("ok", map[string]any{
+	pkgHTTP.SendResponse(w, http.StatusOK, response.Success("ok", map[string]any{
 		"timestamp": time.Now().Format(time.DateTime),
 	}))
 }

@@ -2,16 +2,13 @@ package http
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+	"time"
 )
-
-type Logger interface {
-	Error(msg string, args ...any)
-}
 
 func SendResponse(
 	w http.ResponseWriter,
-	log Logger,
 	statusCode int,
 	resp any,
 ) {
@@ -23,8 +20,9 @@ func SendResponse(
 	enc.SetEscapeHTML(false)
 
 	if err := enc.Encode(resp); err != nil {
-		log.Error(
+		log.Println(
 			"failed to write http response",
+			"time", time.Now(),
 			"status", statusCode,
 			"error", err,
 		)
