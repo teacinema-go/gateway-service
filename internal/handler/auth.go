@@ -8,6 +8,7 @@ import (
 
 	authv1 "github.com/teacinema-go/contracts/gen/go/auth/v1"
 	"github.com/teacinema-go/core/http/response"
+	"github.com/teacinema-go/core/logger"
 	"github.com/teacinema-go/gateway-service/internal/dto/request"
 	"github.com/teacinema-go/gateway-service/pkg/grpc"
 	pkgHTTP "github.com/teacinema-go/gateway-service/pkg/http"
@@ -15,7 +16,7 @@ import (
 
 func (h *Handler) SendOtp(w http.ResponseWriter, r *http.Request) {
 	var req request.SendOtpRequest
-	log := h.logger.With("method", "SendOtp")
+	log := logger.With("method", "SendOtp")
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		pkgHTTP.SendResponse(w, http.StatusBadRequest, response.ErrorNoData("invalid json body"))
 		return
@@ -57,7 +58,7 @@ func (h *Handler) SendOtp(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) VerifyOtp(w http.ResponseWriter, r *http.Request) {
 	var req request.VerifyOtpRequest
-	log := h.logger.With("method", "VerifyOtp")
+	log := logger.With("method", "VerifyOtp")
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		pkgHTTP.SendResponse(w, http.StatusBadRequest, response.ErrorNoData("invalid json body"))
 		return

@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"log/slog"
 
 	"github.com/teacinema-go/core/logger"
 	"github.com/teacinema-go/gateway-service/internal/app"
@@ -15,12 +14,12 @@ func main() {
 		log.Fatal("failed to load config:", err)
 	}
 
-	l := logger.New(cfg.App.Env).With(slog.String("service", "gateway-service"))
-	l.Info("config loaded successfully", "env", cfg.App.Env)
+	logger.Init(cfg.App.Env)
+	logger.Info("config loaded successfully", "env", cfg.App.Env)
 
-	application := app.New(cfg, l)
+	application := app.New(cfg)
 
 	if err = application.Run(); err != nil {
-		l.Error("application stopped with error", "error", err)
+		logger.Error("application stopped with error", "error", err)
 	}
 }

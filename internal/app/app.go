@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/teacinema-go/core/logger"
 	"github.com/teacinema-go/gateway-service/internal/clients"
 	"github.com/teacinema-go/gateway-service/internal/config"
 	"github.com/teacinema-go/gateway-service/internal/handler"
@@ -18,14 +18,12 @@ import (
 
 type App struct {
 	cfg        *config.Config
-	logger     *slog.Logger
 	httpServer *http.Server
 }
 
-func New(cfg *config.Config, logger *slog.Logger) *App {
+func New(cfg *config.Config) *App {
 	return &App{
-		cfg:    cfg,
-		logger: logger,
+		cfg: cfg,
 	}
 }
 
@@ -36,11 +34,11 @@ func (a *App) Run() error {
 	}
 	defer func() {
 		if err := clientManager.Close(); err != nil {
-			a.logger.Error("failed to close client manager", "error", err)
+			logger.Error("failed to close client manager", "error", err)
 		}
 	}()
 
-	h := handler.NewHandler(a.logger, clientManager)
+	h := handler.NewHandler(clientManager)
 
 	a.httpServer = &http.Server{
 		Addr:         fmt.Sprintf(":%d", a.cfg.App.Port),
@@ -54,20 +52,20 @@ func (a *App) Run() error {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		a.logger.Info("starting HTTP server",
+		logger.Info("starting HTTP server",
 			"port", a.cfg.App.Port,
 			"host", a.cfg.App.Host,
 			"env", a.cfg.App.Env,
 		)
 
 		if err := a.httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			a.logger.Error("HTTP server error", "error", err)
+			logger.Error("HTTP server error", "error", err)
 			quit <- syscall.SIGTERM
 		}
 	}()
 
 	sig := <-quit
-	a.logger.Info("received shutdown signal", "signal", sig.String())
+	logger.Info("received shutdown signal", "signal", sig.String())
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -76,12 +74,12 @@ func (a *App) Run() error {
 		return fmt.Errorf("server shutdown failed: %w", err)
 	}
 
-	a.logger.Info("server stopped gracefully")
+	logger.Info("server stopped gracefully")
 	return nil
 }
 
 func (a *App) Shutdown(ctx context.Context) error {
-	a.logger.Info("shutting down server...")
+	logger.Info("shutting down server...")
 	if err := a.httpServer.Shutdown(ctx); err != nil {
 		return fmt.Errorf("HTTP server shutdown error: %w", err)
 	}

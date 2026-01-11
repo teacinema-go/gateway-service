@@ -2,9 +2,10 @@ package http
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"time"
+
+	"github.com/teacinema-go/core/logger"
 )
 
 func SendResponse(
@@ -20,7 +21,7 @@ func SendResponse(
 	enc.SetEscapeHTML(false)
 
 	if err := enc.Encode(resp); err != nil {
-		log.Println(
+		logger.Error(
 			"failed to write http response",
 			"time", time.Now(),
 			"status", statusCode,
