@@ -12,7 +12,7 @@ func HandleGrpcError(err error) (int, string) {
 	if !ok {
 		return http.StatusInternalServerError, "internal server error"
 	}
-
+	msg := st.Message()
 	var httpStatus int
 	switch st.Code() {
 	case codes.InvalidArgument:
@@ -29,9 +29,13 @@ func HandleGrpcError(err error) (int, string) {
 		httpStatus = http.StatusGatewayTimeout
 	case codes.Internal, codes.Unknown:
 		httpStatus = http.StatusInternalServerError
+		msg = "internal server error"
+	case codes.Unavailable:
+		httpStatus = http.StatusServiceUnavailable
+		msg = "service unavailable"
 	default:
 		httpStatus = http.StatusInternalServerError
 	}
 
-	return httpStatus, st.Message()
+	return httpStatus, msg
 }
