@@ -24,7 +24,7 @@ func (r *SendOtpRequest) Validate(v *validator.Validate) error {
 type VerifyOtpRequest struct {
 	Identifier     string              `json:"identifier" validate:"required"`
 	IdentifierType enum.IdentifierType `json:"identifier_type" validate:"required,oneof=phone email"`
-	Otp            string              `json:"otp" validate:"required"`
+	Otp            string              `json:"otp" validate:"required,numeric,len=6"`
 }
 
 func (r *VerifyOtpRequest) Validate(v *validator.Validate) error {
