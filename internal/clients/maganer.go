@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/teacinema-go/gateway-service/internal/config"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Manager struct {
@@ -37,17 +35,4 @@ func (m *Manager) Close() error {
 		}
 	}
 	return firstErr
-}
-
-func newGRPCConnection(serviceURL string) (*grpc.ClientConn, error) {
-	// TODO: use TLS in production, use circuit breaker or other pattern in production
-	conn, err := grpc.NewClient(
-		serviceURL,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect at %s: %w", serviceURL, err)
-	}
-
-	return conn, nil
 }
