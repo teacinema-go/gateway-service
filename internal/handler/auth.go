@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"time"
 
@@ -15,17 +14,12 @@ import (
 )
 
 func (h *Handler) SendOtp(w http.ResponseWriter, r *http.Request) {
-	var req request.SendOtpRequest
 	log := logger.With("method", "SendOtp")
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		pkgHTTP.SendResponse(w, http.StatusBadRequest, response.ErrorNoData("invalid json body"))
-		return
-	}
 
-	if err := req.Validate(h.validator); err != nil {
-		pkgHTTP.SendResponse(w, http.StatusUnprocessableEntity, response.Error("validation failed", map[string]any{
-			"error": err.Error(),
-		}))
+	req, ok := request.GetValue[request.SendOtpRequest](r.Context())
+	if !ok {
+		log.Error("failed to get request from context")
+		pkgHTTP.SendResponse(w, http.StatusInternalServerError, response.ErrorNoData("internal server error"))
 		return
 	}
 
@@ -57,17 +51,12 @@ func (h *Handler) SendOtp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) VerifyOtp(w http.ResponseWriter, r *http.Request) {
-	var req request.VerifyOtpRequest
 	log := logger.With("method", "VerifyOtp")
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		pkgHTTP.SendResponse(w, http.StatusBadRequest, response.ErrorNoData("invalid json body"))
-		return
-	}
 
-	if err := req.Validate(h.validator); err != nil {
-		pkgHTTP.SendResponse(w, http.StatusUnprocessableEntity, response.Error("validation failed", map[string]any{
-			"error": err.Error(),
-		}))
+	req, ok := request.GetValue[request.VerifyOtpRequest](r.Context())
+	if !ok {
+		log.Error("failed to get request from context")
+		pkgHTTP.SendResponse(w, http.StatusInternalServerError, response.ErrorNoData("internal server error"))
 		return
 	}
 

@@ -10,18 +10,16 @@ import (
 	"github.com/teacinema-go/core/logger"
 	"github.com/teacinema-go/gateway-service/internal/clients"
 	mw "github.com/teacinema-go/gateway-service/internal/middleware"
+	validatorMW "github.com/teacinema-go/gateway-service/internal/middleware/validator"
 )
 
 type Handler struct {
-	validator *validator.Validate
-	clients   *clients.Manager
+	clients *clients.Manager
 }
 
 func NewHandler(clients *clients.Manager) *Handler {
-	v := validator.New()
 	return &Handler{
-		validator: v,
-		clients:   clients,
+		clients: clients,
 	}
 }
 
@@ -33,13 +31,15 @@ func (h *Handler) Routes() http.Handler {
 	r.Use(mw.Logger(logger.With()))
 	r.Use(middleware.Recoverer)
 
+	v := validator.New()
+
 	r.Get("/health", h.Health)
 
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
 			r.Route("/auth", func(r chi.Router) {
-				r.Post("/otp/send", h.SendOtp)
-				r.Post("/otp/verify", h.VerifyOtp)
+				r.With(validatorMW.SendOtp(v)).Post("/otp/send", h.SendOtp)
+				r.With(validatorMW.VerifyOtp(v)).Post("/otp/verify", h.VerifyOtp)
 			})
 		})
 	})
