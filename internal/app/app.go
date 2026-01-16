@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/teacinema-go/core/logger"
-	"github.com/teacinema-go/gateway-service/internal/clients"
 	"github.com/teacinema-go/gateway-service/internal/config"
-	"github.com/teacinema-go/gateway-service/internal/handler"
+	"github.com/teacinema-go/gateway-service/internal/transport/grpc/clients"
+	"github.com/teacinema-go/gateway-service/internal/transport/http/handlers"
 )
 
 type App struct {
@@ -38,7 +38,7 @@ func (a *App) Run() error {
 		}
 	}()
 
-	h := handler.NewHandler(clientManager)
+	h := handlers.NewHandler(clientManager)
 
 	a.httpServer = &http.Server{
 		Addr:         fmt.Sprintf(":%d", a.cfg.App.Port),
