@@ -4,19 +4,13 @@ import (
 	"context"
 
 	authv1 "github.com/teacinema-go/contracts/gen/go/auth/v1"
-	"github.com/teacinema-go/gateway-service/internal/dto/request"
+	"github.com/teacinema-go/gateway-service/internal/auth/dto/request"
 	"google.golang.org/grpc"
 )
 
 type authServiceClient struct {
 	client authv1.AuthServiceClient
 	conn   *grpc.ClientConn
-}
-
-type AuthServiceClient interface {
-	SendOtp(ctx context.Context, req request.SendOtpRequest) (*authv1.SendOtpResponse, error)
-	VerifyOtp(ctx context.Context, req request.VerifyOtpRequest) (*authv1.VerifyOtpResponse, error)
-	Close() error
 }
 
 func NewAuthServiceClient(authServiceUrl string) (AuthServiceClient, error) {

@@ -1,10 +1,19 @@
 package clients
 
 import (
+	"context"
 	"fmt"
 
+	authv1 "github.com/teacinema-go/contracts/gen/go/auth/v1"
+	"github.com/teacinema-go/gateway-service/internal/auth/dto/request"
 	"github.com/teacinema-go/gateway-service/internal/config"
 )
+
+type AuthServiceClient interface {
+	SendOtp(ctx context.Context, req request.SendOtpRequest) (*authv1.SendOtpResponse, error)
+	VerifyOtp(ctx context.Context, req request.VerifyOtpRequest) (*authv1.VerifyOtpResponse, error)
+	Close() error
+}
 
 type Manager struct {
 	Auth    AuthServiceClient

@@ -8,7 +8,8 @@ import (
 	authv1 "github.com/teacinema-go/contracts/gen/go/auth/v1"
 	"github.com/teacinema-go/core/http/response"
 	"github.com/teacinema-go/core/logger"
-	"github.com/teacinema-go/gateway-service/internal/dto/request"
+	"github.com/teacinema-go/gateway-service/internal/auth/dto/request"
+	appContextUtil "github.com/teacinema-go/gateway-service/pkg/context"
 	"github.com/teacinema-go/gateway-service/pkg/grpc"
 	pkgHTTP "github.com/teacinema-go/gateway-service/pkg/http"
 )
@@ -16,7 +17,7 @@ import (
 func (h *Handler) SendOtp(w http.ResponseWriter, r *http.Request) {
 	log := logger.With("method", "SendOtp")
 
-	req, ok := request.GetValue[request.SendOtpRequest](r.Context())
+	req, ok := appContextUtil.GetValue[request.SendOtpRequest](r.Context())
 	if !ok {
 		log.Error("failed to get request from context")
 		pkgHTTP.SendResponse(w, http.StatusInternalServerError, response.ErrorNoData("internal server error"))
@@ -53,7 +54,7 @@ func (h *Handler) SendOtp(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) VerifyOtp(w http.ResponseWriter, r *http.Request) {
 	log := logger.With("method", "VerifyOtp")
 
-	req, ok := request.GetValue[request.VerifyOtpRequest](r.Context())
+	req, ok := appContextUtil.GetValue[request.VerifyOtpRequest](r.Context())
 	if !ok {
 		log.Error("failed to get request from context")
 		pkgHTTP.SendResponse(w, http.StatusInternalServerError, response.ErrorNoData("internal server error"))

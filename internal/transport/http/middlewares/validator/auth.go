@@ -5,7 +5,8 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/teacinema-go/core/http/response"
-	"github.com/teacinema-go/gateway-service/internal/dto/request"
+	"github.com/teacinema-go/gateway-service/internal/auth/dto/request"
+	appContextUtil "github.com/teacinema-go/gateway-service/pkg/context"
 	pkgHTTP "github.com/teacinema-go/gateway-service/pkg/http"
 )
 
@@ -24,7 +25,7 @@ func SendOtp(v *validator.Validate) func(http.Handler) http.Handler {
 				return
 			}
 
-			if err := request.ValidateIdentifier(req.Identifier, req.IdentifierType); err != nil {
+			if err := req.IdentifierType.Validate(req.Identifier); err != nil {
 				pkgHTTP.SendResponse(w, http.StatusUnprocessableEntity, response.Error("validation failed", map[string]any{
 					"fields": map[string]string{
 						"identifier": err.Error(),
@@ -33,7 +34,7 @@ func SendOtp(v *validator.Validate) func(http.Handler) http.Handler {
 				return
 			}
 
-			ctx := request.WithValue[request.SendOtpRequest](r.Context(), req)
+			ctx := appContextUtil.WithValue[request.SendOtpRequest](r.Context(), req)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
@@ -54,7 +55,7 @@ func VerifyOtp(v *validator.Validate) func(http.Handler) http.Handler {
 				return
 			}
 
-			if err := request.ValidateIdentifier(req.Identifier, req.IdentifierType); err != nil {
+			if err := req.IdentifierType.Validate(req.Identifier); err != nil {
 				pkgHTTP.SendResponse(w, http.StatusUnprocessableEntity, response.Error("validation failed", map[string]any{
 					"fields": map[string]string{
 						"identifier": err.Error(),
@@ -63,7 +64,7 @@ func VerifyOtp(v *validator.Validate) func(http.Handler) http.Handler {
 				return
 			}
 
-			ctx := request.WithValue[request.VerifyOtpRequest](r.Context(), req)
+			ctx := appContextUtil.WithValue[request.VerifyOtpRequest](r.Context(), req)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
