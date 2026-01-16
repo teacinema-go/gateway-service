@@ -12,7 +12,7 @@ import (
 
 	"github.com/teacinema-go/core/logger"
 	"github.com/teacinema-go/gateway-service/internal/config"
-	"github.com/teacinema-go/gateway-service/internal/transport/grpc/clients"
+	"github.com/teacinema-go/gateway-service/internal/infra/grpc/clients"
 	"github.com/teacinema-go/gateway-service/internal/transport/http/handlers"
 )
 

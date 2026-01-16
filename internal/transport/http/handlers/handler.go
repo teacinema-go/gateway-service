@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-playground/validator/v10"
 	"github.com/teacinema-go/core/logger"
-	"github.com/teacinema-go/gateway-service/internal/transport/grpc/clients"
+	"github.com/teacinema-go/gateway-service/internal/infra/grpc/clients"
 	mw "github.com/teacinema-go/gateway-service/internal/transport/http/middlewares"
 	validatorMW "github.com/teacinema-go/gateway-service/internal/transport/http/middlewares/validator"
 )
