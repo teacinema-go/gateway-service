@@ -87,9 +87,18 @@ func (h *Handler) VerifyOtp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    res.Tokens.RefreshToken,
+		Path:     "/", // TODO refresh route
+		HttpOnly: true,
+		Secure:   false, // TODO true in production
+		SameSite: http.SameSiteStrictMode,
+		Expires:  time.Now().Add(7 * 24 * time.Hour),
+	})
+
 	pkgHTTP.SendResponse(w, http.StatusOK, response.Success("ok", map[string]any{
 		"access_token":       res.Tokens.AccessToken,
-		"refresh_token":      res.Tokens.RefreshToken,
 		"expires_in_seconds": res.Tokens.ExpiresInSeconds,
 	}))
 }
