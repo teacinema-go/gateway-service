@@ -25,7 +25,7 @@ type ServiceConfig struct {
 }
 
 func Load() (*Config, error) {
-	viper.SetDefault("APP_ENV", constants.Development)
+	viper.SetDefault("APP_ENV", constants.Local)
 	viper.SetDefault("APP_PORT", 8000)
 	viper.SetDefault("APP_HOST", "http://localhost:8000")
 	viper.SetDefault("SERVICE_AUTH_URL", "http://localhost:50051")

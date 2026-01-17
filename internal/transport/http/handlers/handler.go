@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-playground/validator/v10"
+	"github.com/teacinema-go/core/constants"
 	"github.com/teacinema-go/core/logger"
 	"github.com/teacinema-go/gateway-service/internal/infra/grpc/clients"
 	mw "github.com/teacinema-go/gateway-service/internal/transport/http/middlewares"
@@ -15,11 +16,13 @@ import (
 
 type Handler struct {
 	clients *clients.Manager
+	env     constants.Env
 }
 
-func NewHandler(clients *clients.Manager) *Handler {
+func NewHandler(clients *clients.Manager, env constants.Env) *Handler {
 	return &Handler{
 		clients: clients,
+		env:     env,
 	}
 }
 

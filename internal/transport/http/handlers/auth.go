@@ -6,6 +6,7 @@ import (
 	"time"
 
 	authv1 "github.com/teacinema-go/contracts/gen/go/auth/v1"
+	"github.com/teacinema-go/core/constants"
 	"github.com/teacinema-go/core/http/response"
 	"github.com/teacinema-go/core/logger"
 	"github.com/teacinema-go/gateway-service/internal/auth/dto/request"
@@ -87,15 +88,21 @@ func (h *Handler) VerifyOtp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
+	cookie := &http.Cookie{
 		Name:     "refresh_token",
 		Value:    res.Tokens.RefreshToken,
 		Path:     "/", // TODO refresh route
 		HttpOnly: true,
-		Secure:   false, // TODO true in production
+		Secure:   true,
 		SameSite: http.SameSiteStrictMode,
 		Expires:  time.Now().Add(7 * 24 * time.Hour),
-	})
+	}
+
+	if h.env == constants.Local {
+		cookie.Secure = false
+	}
+
+	http.SetCookie(w, cookie)
 
 	pkgHTTP.SendResponse(w, http.StatusOK, response.Success("ok", map[string]any{
 		"access_token":       res.Tokens.AccessToken,
