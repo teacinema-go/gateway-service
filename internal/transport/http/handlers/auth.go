@@ -91,15 +91,10 @@ func (h *Handler) VerifyOtp(w http.ResponseWriter, r *http.Request) {
 	cookie := &http.Cookie{
 		Name:     "refresh_token",
 		Value:    res.Tokens.RefreshToken,
-		Path:     "/", // TODO refresh route
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   h.env != constants.Local,
 		SameSite: http.SameSiteStrictMode,
-		Expires:  time.Now().Add(7 * 24 * time.Hour),
-	}
-
-	if h.env == constants.Local {
-		cookie.Secure = false
+		Expires:  time.Now().Add(14 * 24 * time.Hour),
 	}
 
 	http.SetCookie(w, cookie)
