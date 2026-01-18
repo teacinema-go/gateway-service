@@ -60,3 +60,15 @@ func (s *authServiceClient) VerifyOtp(ctx context.Context, r request.VerifyOtpRe
 	}
 	return res, nil
 }
+
+func (s *authServiceClient) Refresh(ctx context.Context, refreshToken string) (*authv1.RefreshResponse, error) {
+	req := &authv1.RefreshRequest{
+		RefreshToken: refreshToken,
+	}
+
+	res, err := s.client.Refresh(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}

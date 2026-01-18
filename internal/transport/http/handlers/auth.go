@@ -88,19 +88,64 @@ func (h *Handler) VerifyOtp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie := &http.Cookie{
-		Name:     "refresh_token",
-		Value:    res.Tokens.RefreshToken,
-		HttpOnly: true,
-		Secure:   h.env != constants.Local,
-		SameSite: http.SameSiteStrictMode,
-		Expires:  time.Now().Add(14 * 24 * time.Hour),
-	}
-
-	http.SetCookie(w, cookie)
+	h.setRefreshCookie(w, res.Tokens.RefreshToken)
 
 	pkgHTTP.SendResponse(w, http.StatusOK, response.Success("ok", map[string]any{
 		"access_token":       res.Tokens.AccessToken,
 		"expires_in_seconds": res.Tokens.ExpiresInSeconds,
 	}))
+}
+
+func (h *Handler) Refresh(w http.ResponseWriter, r *http.Request) {
+	log := logger.With("method", "Refresh")
+
+	httpCookie, err := r.Cookie("refresh_token")
+	if err != nil {
+		log.Error("failed to get refresh token cookie")
+		pkgHTTP.SendResponse(w, http.StatusBadRequest, response.ErrorNoData("invalid refresh token cookie"))
+		return
+	}
+
+	refreshToken := httpCookie.Value
+
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+	res, err := h.clients.Auth.Refresh(ctx, refreshToken)
+	if err != nil {
+		httpStatus, msg := grpc.HandleGrpcError(err)
+		log.Error("gRPC request failed", "error", err, "message", msg, "status", httpStatus)
+		pkgHTTP.SendResponse(w, httpStatus, response.ErrorNoData(msg))
+		return
+	}
+
+	if !res.Success {
+		log.Error("gRPC request failed", "error", res.ErrorMessage)
+		switch res.ErrorCode {
+		case authv1.RefreshResponse_EXPIRED_REFRESH_TOKEN, authv1.RefreshResponse_INVALID_REFRESH_TOKEN:
+			pkgHTTP.SendResponse(w, http.StatusUnauthorized, response.ErrorNoData(res.ErrorMessage))
+		case authv1.RefreshResponse_INTERNAL_ERROR, authv1.RefreshResponse_ERROR_CODE_UNSPECIFIED:
+			pkgHTTP.SendResponse(w, http.StatusInternalServerError, response.ErrorNoData("internal server error"))
+		}
+
+		return
+	}
+
+	h.setRefreshCookie(w, res.Tokens.RefreshToken)
+
+	pkgHTTP.SendResponse(w, http.StatusOK, response.Success("ok", map[string]any{
+		"access_token":       res.Tokens.AccessToken,
+		"expires_in_seconds": res.Tokens.ExpiresInSeconds,
+	}))
+}
+
+func (h *Handler) setRefreshCookie(w http.ResponseWriter, token string) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    token,
+		Path:     "/api/v1/auth/refresh",
+		HttpOnly: true,
+		Secure:   h.env != constants.Local,
+		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Now().Add(14 * 24 * time.Hour),
+	})
 }

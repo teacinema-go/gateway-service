@@ -5,10 +5,10 @@ go 1.25.2
 require (
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-playground/validator/v10 v10.30.1
-	github.com/nyaruka/phonenumbers v1.6.7
+	github.com/nyaruka/phonenumbers v1.6.8
 	github.com/spf13/viper v1.21.0
-	github.com/teacinema-go/contracts v0.5.0
-	github.com/teacinema-go/core v0.9.0
+	github.com/teacinema-go/contracts v0.7.0
+	github.com/teacinema-go/core v0.10.1
 	google.golang.org/grpc v1.78.0
 )
 

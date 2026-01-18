@@ -43,6 +43,7 @@ func (h *Handler) Routes() http.Handler {
 			r.Route("/auth", func(r chi.Router) {
 				r.With(validatorMW.SendOtp(v)).Post("/otp/send", h.SendOtp)
 				r.With(validatorMW.VerifyOtp(v)).Post("/otp/verify", h.VerifyOtp)
+				r.Post("/refresh", h.Refresh)
 			})
 		})
 	})
