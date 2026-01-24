@@ -15,9 +15,10 @@ type Config struct {
 }
 
 type AppConfig struct {
-	Env  constants.Env `mapstructure:"APP_ENV" validate:"required"`
-	Port int           `mapstructure:"APP_PORT" validate:"required"`
-	Host string        `mapstructure:"APP_HOST" validate:"required,url"`
+	Env       constants.Env `mapstructure:"APP_ENV" validate:"required"`
+	Port      int           `mapstructure:"APP_PORT" validate:"required"`
+	Host      string        `mapstructure:"APP_HOST" validate:"required,url"`
+	SecretKey string        `mapstructure:"APP_SECRET_KEY" validate:"required"`
 }
 
 type ServiceConfig struct {
@@ -25,11 +26,6 @@ type ServiceConfig struct {
 }
 
 func Load() (*Config, error) {
-	viper.SetDefault("APP_ENV", constants.Local)
-	viper.SetDefault("APP_PORT", 8000)
-	viper.SetDefault("APP_HOST", "http://localhost:8000")
-	viper.SetDefault("SERVICE_AUTH_URL", "http://localhost:50051")
-
 	viper.SetConfigFile(".env")
 	viper.AutomaticEnv()
 

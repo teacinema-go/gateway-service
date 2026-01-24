@@ -38,7 +38,7 @@ func (a *App) Run() error {
 		}
 	}()
 
-	h := handlers.NewHandler(clientManager, a.cfg.App.Env)
+	h := handlers.NewHandler(clientManager, a.cfg.App.Env, a.cfg.App.SecretKey)
 
 	a.httpServer = &http.Server{
 		Addr:         fmt.Sprintf(":%d", a.cfg.App.Port),

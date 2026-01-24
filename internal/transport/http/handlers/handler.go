@@ -15,14 +15,16 @@ import (
 )
 
 type Handler struct {
-	clients *clients.Manager
-	env     constants.Env
+	clients   *clients.Manager
+	env       constants.Env
+	secretKey string
 }
 
-func NewHandler(clients *clients.Manager, env constants.Env) *Handler {
+func NewHandler(clients *clients.Manager, env constants.Env, secretKey string) *Handler {
 	return &Handler{
-		clients: clients,
-		env:     env,
+		clients:   clients,
+		env:       env,
+		secretKey: secretKey,
 	}
 }
 

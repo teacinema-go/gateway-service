@@ -14,3 +14,5 @@ type VerifyOtpRequest struct {
 	IdentifierType valueobject.IdentifierType `json:"identifier_type" validate:"required,oneof=phone email"`
 	Otp            string                     `json:"otp" validate:"required,numeric,len=6"`
 }
+
+type UserID string
