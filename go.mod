@@ -7,7 +7,7 @@ require (
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/nyaruka/phonenumbers v1.6.8
 	github.com/spf13/viper v1.21.0
-	github.com/teacinema-go/contracts v0.7.0
+	github.com/teacinema-go/contracts v0.8.0
 	github.com/teacinema-go/core v0.10.1
 	google.golang.org/grpc v1.78.0
 )

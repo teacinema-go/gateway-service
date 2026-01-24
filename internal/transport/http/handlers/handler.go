@@ -44,6 +44,7 @@ func (h *Handler) Routes() http.Handler {
 				r.With(validatorMW.SendOtp(v)).Post("/otp/send", h.SendOtp)
 				r.With(validatorMW.VerifyOtp(v)).Post("/otp/verify", h.VerifyOtp)
 				r.Post("/refresh", h.Refresh)
+				r.Post("/logout", h.Logout)
 			})
 		})
 	})

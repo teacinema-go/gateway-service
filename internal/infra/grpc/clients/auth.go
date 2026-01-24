@@ -72,3 +72,15 @@ func (s *authServiceClient) Refresh(ctx context.Context, refreshToken string) (*
 	}
 	return res, nil
 }
+
+func (s *authServiceClient) Logout(ctx context.Context, refreshToken string) (*authv1.LogoutResponse, error) {
+	req := &authv1.LogoutRequest{
+		RefreshToken: refreshToken,
+	}
+
+	res, err := s.client.Logout(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}

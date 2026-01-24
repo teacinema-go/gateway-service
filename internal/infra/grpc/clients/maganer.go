@@ -13,6 +13,7 @@ type AuthServiceClient interface {
 	SendOtp(ctx context.Context, req request.SendOtpRequest) (*authv1.SendOtpResponse, error)
 	VerifyOtp(ctx context.Context, req request.VerifyOtpRequest) (*authv1.VerifyOtpResponse, error)
 	Refresh(ctx context.Context, refreshToken string) (*authv1.RefreshResponse, error)
+	Logout(ctx context.Context, refreshToken string) (*authv1.LogoutResponse, error)
 	Close() error
 }
 

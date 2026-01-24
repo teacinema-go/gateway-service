@@ -138,14 +138,62 @@ func (h *Handler) Refresh(w http.ResponseWriter, r *http.Request) {
 	}))
 }
 
+func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
+	log := logger.With("method", "Logout")
+
+	httpCookie, err := r.Cookie("refresh_token")
+	if err != nil {
+		log.Error("failed to get refresh token cookie")
+		pkgHTTP.SendResponse(w, http.StatusBadRequest, response.ErrorNoData("invalid refresh token cookie"))
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+	res, err := h.clients.Auth.Logout(ctx, httpCookie.Value)
+	if err != nil {
+		httpStatus, msg := grpc.HandleGrpcError(err)
+		log.Error("gRPC request failed", "error", err, "message", msg, "status", httpStatus)
+		pkgHTTP.SendResponse(w, httpStatus, response.ErrorNoData(msg))
+		return
+	}
+
+	if !res.Success {
+		log.Error("gRPC request failed", "error", res.ErrorMessage)
+		switch res.ErrorCode {
+		case authv1.LogoutResponse_INVALID_REFRESH_TOKEN:
+			pkgHTTP.SendResponse(w, http.StatusBadRequest, response.ErrorNoData(res.ErrorMessage))
+		case authv1.LogoutResponse_INTERNAL_ERROR, authv1.LogoutResponse_ERROR_CODE_UNSPECIFIED:
+			pkgHTTP.SendResponse(w, http.StatusInternalServerError, response.ErrorNoData("internal server error"))
+		}
+		return
+	}
+
+	h.clearRefreshCookie(w)
+
+	pkgHTTP.SendResponse(w, http.StatusOK, response.SuccessNoData("logged out"))
+}
+
 func (h *Handler) setRefreshCookie(w http.ResponseWriter, token string) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    token,
-		Path:     "/api/v1/auth/refresh",
+		Path:     "/api/v1/auth",
 		HttpOnly: true,
 		Secure:   h.env != constants.Local,
 		SameSite: http.SameSiteLaxMode,
 		Expires:  time.Now().Add(14 * 24 * time.Hour),
+	})
+}
+
+func (h *Handler) clearRefreshCookie(w http.ResponseWriter) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    "",
+		Path:     "/api/v1/auth",
+		HttpOnly: true,
+		Secure:   h.env != constants.Local,
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   -1,
 	})
 }
